@@ -52,7 +52,34 @@ def get_package_info_pacman()
   dir = Dir::open(path)
   for n in dir
     file = path + "/" + n + "/desc"
-    puts n
+    if File::exist?(file) then
+      flag = true
+      l = ""
+      @name = ""
+      @version = ""
+      @source = ""
+      @depends = Array.new
+
+      fr = IO.readlines (file)
+      for line in fr
+        if line.strip.eql?("")          then l = ""
+        elsif line.strip[0].eql?("\\n") then l = ""
+        elsif line.strip[0].eql?("\%")  then l = line.strip
+        else
+          if l.eql?("\%NAME\%")         then l = "" ; @name = line.strip;
+          elsif l.eql?("\%VERSION\%")   then l = "" ; @version = line.strip
+          elsif l.eql?("\%BASE\%")      then l = "" ; @source = line.strip
+          elsif l.eql?("\%DEPENDS\%")   then (@depends << line.strip) if not line.strip.eql?("")
+          end
+        end
+      end
+
+      puts "name:    #{@name}"
+      puts "version: #{@version}"
+      puts "source:  #{@source}"
+      puts "depends: #{@depends}"
+      puts "\n\n"
+    end
   end
 
 
@@ -62,7 +89,6 @@ end
 END {
 
 }
-
 
 
 
